@@ -99,7 +99,13 @@ class AnalizadorComercial:
             df[col] = le.fit_transform(df[col].astype(str))
         if 'fecha' in df.columns:
             df = df.drop(columns=['fecha'])
-        excluir = [target,'id_registro']
+        # Se excluyen variables con data leakage directo o derivado de la variable objetivo:
+        # - venta_bruta y venta_neta: calculadas a partir de unidades * precio, correlación lineal directa
+        # - meta_unidades: parte de la ecuación que define cumplimiento_meta (target)
+        # Mantener estas variables permitiría al modelo "ver la respuesta" y obtener
+        # accuracy artificialmente perfecto, lo que no representa aprendizaje real.
+        EXCLUIR_LEAKAGE = ['venta_bruta', 'venta_neta', 'meta_unidades']
+        excluir = [target, 'id_registro'] + EXCLUIR_LEAKAGE
         feats   = [c for c in df.columns if c not in excluir]
         return df[feats], df[target]
 
