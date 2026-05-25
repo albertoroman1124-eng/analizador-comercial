@@ -95,7 +95,7 @@ class AnalizadorComercial:
     def preparar_modelo(self, target):
         df = self.df.copy()
         le = LabelEncoder()
-        for col in df.select_dtypes(include=['object','str']).columns:
+        for col in df.select_dtypes(include='object').columns:
             df[col] = le.fit_transform(df[col].astype(str))
         if 'fecha' in df.columns:
             df = df.drop(columns=['fecha'])
