@@ -1,4 +1,3 @@
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -96,7 +95,7 @@ class AnalizadorComercial:
     def preparar_modelo(self, target):
         df = self.df.copy()
         le = LabelEncoder()
-        for col in df.select_dtypes(include='object').columns:
+        for col in df.select_dtypes(include=['object','str']).columns:
             df[col] = le.fit_transform(df[col].astype(str))
         if 'fecha' in df.columns:
             df = df.drop(columns=['fecha'])
@@ -252,7 +251,7 @@ with tab1:
                          labels={'venta_neta':'USD','canal':'Canal'},template='plotly_white')
             fig.update_layout(height=300,showlegend=False,coloraxis_showscale=False)
             fig.update_traces(text=df_canal['venta_neta'].apply(lambda x:f"USD {x:,.0f}"),textposition='outside')
-            st.plotly_chart(fig, use_container_width=True)
+            st.plotly_chart(fig, width='stretch')
     with col_b:
         if 'categoria' in df.columns:
             st.markdown("#### Venta Neta por Categoría")
@@ -260,10 +259,10 @@ with tab1:
             fig2 = px.pie(df_cat,values='venta_neta',names='categoria',
                           color_discrete_sequence=px.colors.sequential.Teal,template='plotly_white')
             fig2.update_layout(height=300)
-            st.plotly_chart(fig2, use_container_width=True)
+            st.plotly_chart(fig2, width='stretch')
 
     st.markdown("#### Vista Previa del Dataset")
-    st.dataframe(df.head(10), use_container_width=True)
+    st.dataframe(df.head(10), width='stretch')
 
 # ══════════════════════════════════════════════════════════════════════
 # TAB 2 — ANÁLISIS DE VENTAS
@@ -286,7 +285,7 @@ with tab2:
                           labels={'venta_neta':'Venta Neta (USD)','mes_nombre':'Mes'},
                           color_discrete_sequence=['#94A3B8','#0D9488','#F59E0B'])
         fig_mes.update_layout(height=380, legend=dict(orientation='h',y=1.08))
-        st.plotly_chart(fig_mes, use_container_width=True)
+        st.plotly_chart(fig_mes, width='stretch')
 
     col_c, col_d = st.columns(2)
     with col_c:
@@ -296,7 +295,7 @@ with tab2:
             fig_r = px.bar(df_reg,x='region',y='venta_neta',color='region',text_auto='.2s',
                            template='plotly_white',color_discrete_sequence=px.colors.qualitative.Set2)
             fig_r.update_layout(height=340,showlegend=False)
-            st.plotly_chart(fig_r, use_container_width=True)
+            st.plotly_chart(fig_r, width='stretch')
     with col_d:
         if 'producto' in df.columns:
             st.markdown("#### Top 10 Productos")
@@ -305,7 +304,7 @@ with tab2:
             fig_p = px.bar(df_prod,x='venta_neta',y='producto',orientation='h',
                            color='venta_neta',color_continuous_scale='Blues',template='plotly_white')
             fig_p.update_layout(height=340,showlegend=False,coloraxis_showscale=False)
-            st.plotly_chart(fig_p, use_container_width=True)
+            st.plotly_chart(fig_p, width='stretch')
 
     if 'canal' in df.columns and 'cumplimiento_meta' in df.columns:
         st.markdown("#### Cumplimiento de Meta por Canal")
@@ -315,7 +314,7 @@ with tab2:
                        template='plotly_white',color_discrete_sequence=['#059669','#D97706','#2563EB','#7C3AED'])
         fig_m.add_hline(y=70,line_dash='dash',line_color='#059669',annotation_text='Meta 70%')
         fig_m.update_layout(height=350,showlegend=False)
-        st.plotly_chart(fig_m, use_container_width=True)
+        st.plotly_chart(fig_m, width='stretch')
 
 # ══════════════════════════════════════════════════════════════════════
 # TAB 3 — CRECIMIENTO YTD & TENDENCIAS
@@ -362,7 +361,7 @@ with tab3:
                      template='plotly_white', title="YTD Acumulado por Año (mismo período)")
     fig_ytd.update_layout(height=350, showlegend=False)
     fig_ytd.update_traces(textposition='outside')
-    st.plotly_chart(fig_ytd, use_container_width=True)
+    st.plotly_chart(fig_ytd, width='stretch')
 
     st.markdown("---")
 
@@ -390,7 +389,7 @@ with tab3:
         yaxis2=dict(title='Crecimiento %', overlaying='y', side='right'),
         template='plotly_white', height=380,
         legend=dict(orientation='h', y=1.1))
-    st.plotly_chart(fig_anual, use_container_width=True)
+    st.plotly_chart(fig_anual, width='stretch')
 
     st.markdown("---")
 
@@ -418,7 +417,7 @@ with tab3:
         xaxis_title='Mes', yaxis_title='Venta Neta (USD)',
         template='plotly_white', height=400,
         legend=dict(orientation='h', y=1.1), barmode='group')
-    st.plotly_chart(fig_mm, use_container_width=True)
+    st.plotly_chart(fig_mm, width='stretch')
 
     st.markdown("---")
 
@@ -441,7 +440,7 @@ with tab3:
     fig_estac.add_hline(y=1.0, line_dash='dash', line_color='#6B7280',
                         annotation_text='Promedio')
     fig_estac.update_layout(height=360, coloraxis_showscale=False)
-    st.plotly_chart(fig_estac, use_container_width=True)
+    st.plotly_chart(fig_estac, width='stretch')
 
 # ══════════════════════════════════════════════════════════════════════
 # TAB 4 — AUDITORÍA ANOMALÍAS
@@ -493,14 +492,14 @@ with tab4:
             fig_box.add_hline(y=lim_sup,line_dash="dash",line_color="#DC2626",
                               annotation_text=f"L.Sup:{lim_sup:,.2f}")
             fig_box.update_layout(height=380)
-            st.plotly_chart(fig_box, use_container_width=True)
+            st.plotly_chart(fig_box, width='stretch')
         with col_tbl:
             st.markdown(f"#### Transacciones Desviadas ({n_out})")
             if n_out > 0:
                 cols_show=[c for c in ['fecha','anio','canal','categoria','producto',
                                         col_audit,'region'] if c in df.columns]
                 st.dataframe(outliers_df[cols_show].reset_index(drop=True),
-                             use_container_width=True, height=380)
+                             width='stretch', height=380)
             else:
                 st.success("✅ No se detectaron anomalías con los parámetros actuales.")
 
@@ -514,7 +513,7 @@ with tab4:
         fig_scat.add_hline(y=lim_inf,line_dash="dot",line_color="#F59E0B")
         fig_scat.add_hline(y=lim_sup,line_dash="dot",line_color="#F59E0B")
         fig_scat.update_layout(height=370)
-        st.plotly_chart(fig_scat, use_container_width=True)
+        st.plotly_chart(fig_scat, width='stretch')
 
 # ══════════════════════════════════════════════════════════════════════
 # TAB 5 — MODELO PREDICTIVO
@@ -580,7 +579,7 @@ with tab5:
                                  color='Importancia',color_continuous_scale='Blues',
                                  template='plotly_white')
                 fig_imp.update_layout(height=380,showlegend=False,coloraxis_showscale=False)
-                st.plotly_chart(fig_imp, use_container_width=True)
+                st.plotly_chart(fig_imp, width='stretch')
             with col_comp:
                 st.markdown("#### Comparación Visual")
                 fig_comp = go.Figure([
@@ -591,7 +590,7 @@ with tab5:
                 fig_comp.update_layout(showlegend=False,
                     yaxis=dict(tickformat='.0%',range=[0,1]),
                     height=380,template='plotly_white')
-                st.plotly_chart(fig_comp, use_container_width=True)
+                st.plotly_chart(fig_comp, width='stretch')
 
             st.markdown(f"#### Reporte Detallado — {ganador}")
             mejor = rf if acc_rf>=acc_lr else lr
@@ -605,6 +604,6 @@ with tab5:
                     if v>=0.50: return 'background-color:#FEF3C7;color:#92400E'
                     return 'background-color:#FEE2E2;color:#991B1B'
                 except: return ''
-            st.dataframe(df_rep.style.applymap(
+            st.dataframe(df_rep.style.map(
                 color_score,subset=['precision','recall','f1-score']),
-                use_container_width=True)
+                width='stretch')
